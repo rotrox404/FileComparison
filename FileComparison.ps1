@@ -23,7 +23,7 @@ function Invoke-FolderHashSummary {
     }
     $myFiles | Select-Object Name, Size, CreationTime | Out-File -FilePath($path + "\filesummary.txt")
     # Generate Hashfile
-    Get-FileHash ($path + "\filesummary.txt") | Out-File -FilePath($path + "\filehash.csv")
+    Get-FileHash ($path + "\filesummary.txt") | Out-File -FilePath($path + "\filehash.txt")
 }
 
 function Invoke-FolderBrowserDialog {
@@ -71,13 +71,15 @@ elseif($userResponse -eq 'Yes'){
     $selectedPath = Invoke-FolderBrowserDialog
 
     # Hash Method
-    $oldFileHashHash = Get-FileHash -Path "$selectedPath\filehash.csv"
+    $oldFileHashHash = Get-FileHash -Path "$selectedPath\filehash.txt"
     Remove-Item "$selectedpath\filesummary.txt"
-    Remove-Item "$selectedpath\filehash.csv"
+    Remove-Item "$selectedpath\filehash.txt"
 
     Invoke-FolderHashSummary -Path $selectedPath
 
-    $newFileHashHash = Get-FileHash -Path "$selectedPath\filehash.csv"
+    $newFileHashHash = Get-FileHash -Path "$selectedPath\filehash.txt"
+    $newFileHashHash
+    $oldFileHashHash
 
     $title = "File Check Result"
     $buttons = [System.Windows.Forms.MessageBoxButtons]::OK
