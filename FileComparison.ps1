@@ -23,7 +23,7 @@ function Invoke-FolderHashSummary {
     }
     $myFiles | Select-Object Name, Size, CreationTime | Out-File -FilePath($path + "\filesummary.txt")
     # Generate Hashfile
-    Get-FileHash ($path + "\filesummary.txt") | Out-File -FilePath($path + "\filehash.txt")
+    Get-FileHash ($path + "\filesummary.txt") | Export-Csv -Path "$path\filehash.csv" -NoTypeInformation
 }
 
 function Invoke-FolderBrowserDialog {
@@ -71,20 +71,20 @@ elseif($userResponse -eq 'Yes'){
     $selectedPath = Invoke-FolderBrowserDialog
 
     # Hash Method
-    $oldFileHashHash = Get-FileHash -Path "$selectedPath\filehash.txt"
+    $oldFileHash = Import-Csv "$selectedPath\filehash.csv" | Select -ExpandProperty Hash
     Remove-Item "$selectedpath\filesummary.txt"
     Remove-Item "$selectedpath\filehash.txt"
 
     Invoke-FolderHashSummary -Path $selectedPath
 
-    $newFileHashHash = Get-FileHash -Path "$selectedPath\filehash.txt"
-    $newFileHashHash
-    $oldFileHashHash
+    $newFileHash = Import-Csv "$selectedPath\filehash.csv" | Select -ExpandProperty Hash
+    $newFileHash
+    $oldFileHash
 
     $title = "File Check Result"
     $buttons = [System.Windows.Forms.MessageBoxButtons]::OK
 
-    if($newFileHashHash -eq $oldFileHashHash){
+    if($newFileHash -eq $oldFileHash){
         # Hashes Match
         $message = "Copied contents match original contents."
         $icons = [System.Windows.Forms.MessageBoxIcon]::Information
